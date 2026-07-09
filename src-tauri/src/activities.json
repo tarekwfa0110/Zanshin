@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "name": "Deep work",
+    "typical_time": "09:00",
+    "duration_minutes": 90,
+    "allowed_apps": ["zed.exe"],
+    "allowed_websites": ["github.com"]
+  },
+  {
+    "id": 2,
+    "name": "Social media",
+    "typical_time": "18:00",
+    "duration_minutes": 30,
+    "allowed_apps": ["facebook.com", "instagram.com"],
+    "allowed_websites": ["facebook.com", "instagram.com"]
+  },
+  {
+    "id": 3,
+    "name": "Coding",
+    "typical_time": "18:00",
+    "duration_minutes": 0,
+    "allowed_apps": ["zed.exe"],
+    "allowed_websites": ["qwqwe"]
+  },
+  {
+    "id": 4,
+    "name": "Reading ",
+    "typical_time": "18:00",
+    "duration_minutes": 0,
+    "allowed_apps": ["qwe"],
+    "allowed_websites": ["qweqweqweqwe"]
+  },
+  {
+    "id": 5,
+    "name": "Writing",
+    "typical_time": "18:00",
+    "duration_minutes": 0,
+    "allowed_apps": ["qwe"],
+    "allowed_websites": ["qweqw"]
+  }
+]
