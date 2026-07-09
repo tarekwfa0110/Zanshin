@@ -19,7 +19,6 @@ fn activities_file(app: &AppHandle) -> Result<PathBuf, String> {
         fs::write(&path, DEFAULT_ACTIVITIES_JSON)
             .map_err(|err| format!("failed to initialize activities.json: {err}"))?;
     }
-
     Ok(path)
 }
 

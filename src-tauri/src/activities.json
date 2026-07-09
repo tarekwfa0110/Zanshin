@@ -20,23 +20,23 @@
     "name": "Coding",
     "typical_time": "18:00",
     "duration_minutes": 0,
-    "allowed_apps": [],
-    "allowed_websites": []
+    "allowed_apps": ["zed.exe"],
+    "allowed_websites": ["qwqwe"]
   },
   {
     "id": 4,
     "name": "Reading ",
     "typical_time": "18:00",
     "duration_minutes": 0,
-    "allowed_apps": [""],
-    "allowed_websites": [""]
+    "allowed_apps": ["qwe"],
+    "allowed_websites": ["qweqweqweqwe"]
   },
   {
     "id": 5,
     "name": "Writing",
     "typical_time": "18:00",
     "duration_minutes": 0,
-    "allowed_apps": [""],
-    "allowed_websites": [""]
+    "allowed_apps": ["qwe"],
+    "allowed_websites": ["qweqw"]
   }
 ]
