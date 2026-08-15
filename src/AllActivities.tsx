@@ -2,20 +2,44 @@ import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Activity } from "./Activity";
-
+import FormModal from "./FormModal";
 
 export default function AllActivities() {
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingActivity, setEditingActivity] = useState<Activity | undefined>(undefined);
 
   useEffect(() => {
+    setIsLoading(true);
     invoke<Activity[]>("get_activities")
       .then(setActivities)
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => setIsLoading(false));
   }, []);
+  
+  const updateActivity = (id: number, activity: Activity) => {
+    return invoke("update_activity", { id, activity })
+      .then(() =>
+        setActivities(activities.map((a) => (a.id === id ? activity : a))),
+      )
+      .catch(console.error);
+  };
 
-  // const handleEdit = (id: number) => {
-    
-  // };
+  const deleteActivity = (id: number) => {
+    invoke("delete_activity", { id })
+      .then(() => setActivities(activities.filter((a) => a.id !== id)))
+      .catch(console.error);
+  };
+  const handleEditActivity = async (data: Omit<Activity, "id">) => {
+    if (!editingActivity) return;
+    const activity: Activity = { id: editingActivity.id, ...data };
+    setIsSubmitting(true);
+    await updateActivity(editingActivity.id, activity);
+    setIsSubmitting(false);
+    setEditingActivity(undefined);
+  };
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
@@ -41,7 +65,7 @@ export default function AllActivities() {
         </Link>
       </div>
 
-      {activities.length === 0 ? (
+      {isLoading ? null : activities.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-white/80 px-6 py-12 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
             No activities yet
@@ -117,14 +141,29 @@ export default function AllActivities() {
                   </div>
 
                   <div>
-                    <button onClick={() => console.log("tbd")}>Edit</button>
+                    <button onClick={() => setEditingActivity(activity)}>
+                      Edit
+                    </button>
                   </div>
-                  
+
+                  <div>
+                    <button onClick={() => deleteActivity(activity.id)}>
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             </article>
           ))}
         </section>
+      )}
+      {editingActivity && (
+        <FormModal
+          isSubmitting={isSubmitting}
+          onSubmit={handleEditActivity}
+          defaultValues={editingActivity}
+          onClose={() => setEditingActivity(undefined)}
+        />
       )}
     </main>
   );

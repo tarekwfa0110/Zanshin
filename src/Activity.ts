@@ -5,4 +5,4 @@ export type Activity = {
     duration_minutes: number;
     allowed_apps: string[];
     allowed_websites: string[];
-  };
+};
