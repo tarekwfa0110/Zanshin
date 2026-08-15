@@ -42,6 +42,7 @@ function App() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     invoke<Activity[]>("get_activities")
@@ -57,44 +58,24 @@ function App() {
     [activities],
   );
 
-  const handleAddNewActivity = async (
-    event: React.FormEvent<HTMLFormElement>,
-  ) => {
-    event.preventDefault();
-
-    const form = event.currentTarget;
-    const formData = new FormData(form);
-    const nextId =
-      activities.reduce((maxId, activity) => Math.max(maxId, activity.id), 0) +
-      1;
-
-    const activity: Activity = {
-      id: nextId,
-      name: String(formData.get("name") ?? ""),
-      typical_time: String(formData.get("typical_time") ?? ""),
-      duration_minutes: Number(formData.get("duration_minutes") ?? 0),
-      allowed_apps: String(formData.get("allowed_apps") ?? "")
-        .split(",")
-        .map((value) => value.trim())
-        .filter(Boolean),
-      allowed_websites: String(formData.get("allowed_websites") ?? "")
-        .split(",")
-        .map((value) => value.trim())
-        .filter(Boolean),
-    };
-
-    try {
-      setIsSubmitting(true);
-      await invoke("add_activity", { activity });
-      const updated = await invoke<Activity[]>("get_activities");
-      setActivities(updated);
-      setIsModalOpen(false);
-      form.reset();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handleAddNewActivity = async (data: Omit<Activity, "id">) => {
+      const nextId =
+        activities.reduce((maxId, activity) => Math.max(maxId, activity.id), 0) + 1;
+  
+      const activity: Activity = { id: nextId, ...data };
+  
+      try {
+        setIsSubmitting(true);
+        setSubmitError(null);
+        await invoke("add_activity", { activity });
+        const updated = await invoke<Activity[]>("get_activities");
+        setActivities(updated);
+        setIsModalOpen(false);
+      } catch (err) {
+        setSubmitError(err instanceof Error ? err.message : String(err));
+      } finally {
+        setIsSubmitting(false);
+      }
   };
 
   return (
@@ -119,35 +100,26 @@ function App() {
         </Link>
         <button
           type="button"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setSubmitError(null);
+            setIsModalOpen(true);
+          }}
           className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800 dark:bg-blue-500 dark:text-slate-950 dark:hover:bg-blue-400"
         >
           Add new activity
         </button>
       </div>
 
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 px-4 py-6 backdrop-blur-sm">
-          <div className="w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-900">
-            <div className="mb-4 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setIsModalOpen(false)}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:border-slate-300 hover:text-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-white"
-                aria-label="Close add activity dialog"
-              >
-                ×
-              </button>
-            </div>
 
-            <FormModal
-              handleAddNewActivity={handleAddNewActivity}
-              isSubmitting={isSubmitting}
-              setIsModalOpen={setIsModalOpen}
-            />
-          </div>
-        </div>
-      )}
+        {isModalOpen && (
+          <FormModal
+            onSubmit={handleAddNewActivity}
+            isSubmitting={isSubmitting}
+            onClose={() => setIsModalOpen(false)}
+            error={submitError}
+          />
+        )}
+
     </main>
   );
 }
