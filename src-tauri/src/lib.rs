@@ -59,6 +59,9 @@ fn delete_activity(id: i32, app: AppHandle) -> Result<(), String> {
 
 #[tauri::command]
 fn update_activity(id: i32, activity: Activity, app: AppHandle) -> Result<(), String> {
+    if activity.id != id {
+        return Err("activity id does not match target id".to_string());
+    }
     let mut activities = read_activities(&app)?;
     if let Some(index) = activities.iter().position(|a| a.id == id) {
         activities[index] = activity;
@@ -72,7 +75,12 @@ fn update_activity(id: i32, activity: Activity, app: AppHandle) -> Result<(), St
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![get_activities, add_activity, delete_activity, update_activity])
+        .invoke_handler(tauri::generate_handler![
+            get_activities,
+            add_activity,
+            delete_activity,
+            update_activity
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

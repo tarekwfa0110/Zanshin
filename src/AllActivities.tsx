@@ -9,7 +9,9 @@ export default function AllActivities() {
   const [isLoading, setIsLoading] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [editingActivity, setEditingActivity] = useState<Activity | undefined>(undefined);
+  const [editingActivity, setEditingActivity] = useState<Activity | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     setIsLoading(true);
@@ -18,27 +20,36 @@ export default function AllActivities() {
       .catch(console.error)
       .finally(() => setIsLoading(false));
   }, []);
-  
+
   const updateActivity = (id: number, activity: Activity) => {
     return invoke("update_activity", { id, activity })
       .then(() =>
-        setActivities(activities.map((a) => (a.id === id ? activity : a))),
+        setActivities((current) =>
+          current.map((a) => (a.id === id ? activity : a)),
+        ),
       )
       .catch(console.error);
   };
-
   const deleteActivity = (id: number) => {
     invoke("delete_activity", { id })
-      .then(() => setActivities(activities.filter((a) => a.id !== id)))
+      .then(() =>
+        setActivities((current) => current.filter((a) => a.id !== id)),
+      )
       .catch(console.error);
   };
   const handleEditActivity = async (data: Omit<Activity, "id">) => {
     if (!editingActivity) return;
     const activity: Activity = { id: editingActivity.id, ...data };
     setIsSubmitting(true);
-    await updateActivity(editingActivity.id, activity);
-    setIsSubmitting(false);
-    setEditingActivity(undefined);
+    try {
+      await updateActivity(editingActivity.id, activity);
+      setEditingActivity(undefined);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+
+    }
   };
 
   return (
@@ -140,14 +151,18 @@ export default function AllActivities() {
                     )}
                   </div>
 
-                  <div>
-                    <button onClick={() => setEditingActivity(activity)}>
+                  <div className="mt-4 flex gap-2">
+                    <button
+                      onClick={() => setEditingActivity(activity)}
+                      className="text-sm font-medium text-slate-500 transition hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400"
+                    >
                       Edit
                     </button>
-                  </div>
-
-                  <div>
-                    <button onClick={() => deleteActivity(activity.id)}>
+                    <span className="text-slate-300 dark:text-slate-600">·</span>
+                    <button
+                      onClick={() => deleteActivity(activity.id)}
+                      className="text-sm font-medium text-slate-500 transition hover:text-red-600 dark:text-slate-400 dark:hover:text-red-400"
+                    >
                       Delete
                     </button>
                   </div>

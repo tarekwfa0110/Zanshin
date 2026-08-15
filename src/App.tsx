@@ -110,48 +110,16 @@ function App() {
         </button>
       </div>
 
-      {isModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 px-4 py-6 backdrop-blur-sm"
-          onKeyDown={(e) => e.key === "Escape" && setIsModalOpen(false)}
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label="Add new activity"
-            className="w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-900"
-          >
-            <div className="mb-4 flex justify-end">
-              <button
-                type="button"
-                onClick={() => {
-                  setSubmitError(null);
-                  setIsModalOpen(false);
-                }}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:border-slate-300 hover:text-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-white"
-                aria-label="Close add activity dialog"
-              >
-                ×
-              </button>
-            </div>
 
-            {submitError && (
-              <p
-                className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200"
-                role="alert"
-              >
-                {submitError}
-              </p>
-            )}
+        {isModalOpen && (
+          <FormModal
+            onSubmit={handleAddNewActivity}
+            isSubmitting={isSubmitting}
+            onClose={() => setIsModalOpen(false)}
+            error={submitError}
+          />
+        )}
 
-            <FormModal
-              onSubmit={handleAddNewActivity}
-              isSubmitting={isSubmitting}
-              onClose={() => setIsModalOpen(false)}
-            />
-          </div>
-        </div>
-      )}
     </main>
   );
 }

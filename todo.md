@@ -1,5 +1,5 @@
 [ ] Get id from backend
-[ ] Add deletion
+[X] Add deletion
 [ ] Add website block
 [ ] Add app block
 [ ] 
